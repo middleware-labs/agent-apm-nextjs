@@ -32,7 +32,7 @@ export function register() {
     });
 }
 ```
-- If you want to instrument your project without any Host then use below code snippet:
+- If you want to instrument your project without installing any host then use below code snippet:
 ```
 // @ts-ignore
 import { track } from '@middleware.io/agent-apm-nextjs';
@@ -42,7 +42,7 @@ export function register() {
         projectName: "<PROJECT-NAME>",
         serviceName: "<SERVICE-NAME>",
         accountKey: "<ACCOUNT-KEY>",
-        target: "<TARGET>"
+        target: "https://<ACCOUNT-UID>.middleware.io:443"
     });
 }
 ```
