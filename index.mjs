@@ -22,20 +22,22 @@ export const track = (args = {}) => {
             }
         });
 
-        let isHostExist = !!(process.env.MW_AGENT_SERVICE && process.env.MW_AGENT_SERVICE !== "");
-        if (isHostExist) {
-            config.hostUrl = `http://${process.env.MW_AGENT_SERVICE}:9320`;
-        }
-
         const resourceAttributes = {
             [SemanticResourceAttributes.SERVICE_NAME]: config.serviceName,
             ['mw_agent']: true,
             ['project.name']: config.projectName,
         };
 
+        if (config.accountKey !== "") {
+            resourceAttributes['mw.account_key'] = config.accountKey;
+        }
+
         if (config.target !== "") {
             config.hostUrl = config.target;
-            resourceAttributes['mw.account_key'] = config.accountKey;
+        }
+
+        if (!!(process.env.MW_AGENT_SERVICE && process.env.MW_AGENT_SERVICE !== "")) {
+            config.hostUrl = `http://${process.env.MW_AGENT_SERVICE}:9320`;
         }
 
         const provider = new NodeTracerProvider({
