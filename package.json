@@ -1,0 +1,46 @@
+{
+  "name": "@middleware.io/agent-apm-nextjs",
+  "version": "1.0.0",
+  "description": "Agent APM for NextJs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/middleware-labs/agent-apm-nextjs.git"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./index.mjs"
+      },
+      "node": {
+        "default": "./index.mjs"
+      },
+      "default": "./index.mjs"
+    }
+  },
+  "keywords": [
+    "apm",
+    "middleware",
+    "nextjs",
+    "observability",
+    "instrumentation",
+    "tracing"
+  ],
+  "author": "Middleware Developers",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/middleware-labs/agent-apm-nextjs/issues"
+  },
+  "homepage": "https://github.com/middleware-labs/agent-apm-nextjs#readme",
+  "dependencies": {
+    "@opentelemetry/exporter-trace-otlp-http": "^0.38.0",
+    "@opentelemetry/resources": "^1.12.0",
+    "@opentelemetry/sdk-trace-node": "^1.12.0",
+    "@opentelemetry/semantic-conventions": "^1.12.0",
+    "process": "^0.11.10"
+  }
+}
