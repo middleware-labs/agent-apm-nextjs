@@ -1,6 +1,6 @@
 # Getting Started
 
-### agent agent-apm-nextjs
+### agent-apm-nextjs
 Description: Agent APM for Next.js
 
 ### Guides
