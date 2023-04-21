@@ -4,7 +4,7 @@
 Description: Agent APM for Next.js
 
 ### Guides
-To use this APM agent, follow below steps:
+You can use this APM to track your self-hosted *(other than Vercel platform)* project . Run follow steps:
 1. Run `npm install @middleware.io/agent-apm-nextjs`.
 2. This feature is experimental, you need to explicitly opt-in by providing below thing into your **next.config.js** file.
 ```
