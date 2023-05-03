@@ -13,13 +13,28 @@
   },
   "exports": {
     ".": {
+      "edge": {
+        "default": "./index.edge.mjs"
+      },
+      "edge-light": {
+        "default": "./index.edge.mjs"
+      },
+      "browser": {
+        "default": "./index.edge.mjs"
+      },
+      "worker": {
+        "default": "./index.edge.mjs"
+      },
+      "workerd": {
+        "default": "./index.edge.mjs"
+      },
       "import": {
-        "default": "./index.mjs"
+        "default": "./index.node.mjs"
       },
       "node": {
-        "default": "./index.mjs"
+        "default": "./index.node.mjs"
       },
-      "default": "./index.mjs"
+      "default": "./index.node.mjs"
     }
   },
   "keywords": [
