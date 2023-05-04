@@ -4,6 +4,7 @@
   "description": "Agent APM for NextJs",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "type": "module",
@@ -14,27 +15,27 @@
   "exports": {
     ".": {
       "edge": {
-        "default": "./index.edge.js"
+        "default": "./src/index.edge.js"
       },
       "edge-light": {
-        "default": "./index.edge.js"
+        "default": "./src/index.edge.js"
       },
       "browser": {
-        "default": "./index.edge.js"
+        "default": "./src/index.edge.js"
       },
       "worker": {
-        "default": "./index.edge.js"
+        "default": "./src/index.edge.js"
       },
       "workerd": {
-        "default": "./index.edge.js"
+        "default": "./src/index.edge.js"
       },
       "import": {
-        "default": "./index.node.js"
+        "default": "./src/index.node.js"
       },
       "node": {
-        "default": "./index.node.js"
+        "default": "./src/index.node.js"
       },
-      "default": "./index.node.js"
+      "default": "./src/index.node.js"
     }
   },
   "keywords": [
@@ -52,10 +53,13 @@
   },
   "homepage": "https://github.com/middleware-labs/agent-apm-nextjs#readme",
   "dependencies": {
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.38.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.38.0",
     "@opentelemetry/resources": "^1.12.0",
     "@opentelemetry/sdk-trace-node": "^1.12.0",
     "@opentelemetry/semantic-conventions": "^1.12.0",
-    "process": "^0.11.10"
+    "@types/node": "^18.16.3",
+    "process": "^0.11.10",
+    "typescript": "^5.0.4"
   }
 }

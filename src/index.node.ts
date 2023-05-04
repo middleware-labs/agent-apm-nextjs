@@ -3,9 +3,9 @@ import { Resource } from "@opentelemetry/resources";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { NodeTracerProvider, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import process from 'process';
+import * as process from 'process';
 
-export const track = (args = {}) => {
+export const track = (args : {[key: string]: any} = {}) => {
 
     if (process.env.NEXT_RUNTIME !== 'nodejs') {
         return;
@@ -20,7 +20,7 @@ export const track = (args = {}) => {
         ...args,
     };
 
-    const resourceAttributes = {
+    const resourceAttributes: {[key: string]: any} = {
         [SemanticResourceAttributes.SERVICE_NAME]: config.serviceName,
         ['mw_agent']: true,
         ['project.name']: config.projectName,
