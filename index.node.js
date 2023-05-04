@@ -7,10 +7,10 @@ import process from 'process';
 
 export const track = (args = {}) => {
 
-    globalThis.message="test message from agent-node-nextjs lib." + process.env.NEXT_RUNTIME;
     /*if (process.env.NEXT_RUNTIME !== 'nodejs') {
         return;
     }*/
+
     const config = {
         hostUrl: 'http://localhost:9320',
         projectName: "Project-" + process.pid,
