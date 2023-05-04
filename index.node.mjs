@@ -16,7 +16,7 @@ export const track = (args = {}) => {
         projectName: "Project-" + process.pid,
         serviceName: "Service-" + process.pid,
         accountKey: "",
-        target: "",
+        target: "vercel",
         ...args,
     };
 
