@@ -14,27 +14,27 @@
   "exports": {
     ".": {
       "edge": {
-        "default": "./index.edge.js"
+        "default": "./index.edge.mjs"
       },
       "edge-light": {
-        "default": "./index.edge.js"
+        "default": "./index.edge.mjs"
       },
       "browser": {
-        "default": "./index.edge.js"
+        "default": "./index.edge.mjs"
       },
       "worker": {
-        "default": "./index.edge.js"
+        "default": "./index.edge.mjs"
       },
       "workerd": {
-        "default": "./index.edge.js"
+        "default": "./index.edge.mjs"
       },
       "import": {
-        "default": "./index.node.js"
+        "default": "./index.node.mjs"
       },
       "node": {
-        "default": "./index.node.js"
+        "default": "./index.node.mjs"
       },
-      "default": "./index.node.js"
+      "default": "./index.node.mjs"
     }
   },
   "keywords": [
