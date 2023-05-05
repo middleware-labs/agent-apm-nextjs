@@ -7,9 +7,10 @@ import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
 
 export const track = (args = {}) => {
 
-    /*if (process.env.NEXT_RUNTIME !== 'nodejs') {
+    globalThis.message = process.env.NEXT_RUNTIME
+    if (process.env.NEXT_RUNTIME !== 'nodejs') {
         return;
-    }*/
+    }
 
     const config = {
         hostUrl: 'http://localhost:9319',
