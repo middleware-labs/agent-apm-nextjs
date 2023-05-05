@@ -4,6 +4,7 @@ import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
 import { Resource } from "@opentelemetry/resources";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
+import * as process from "process";
 
 export const track = (args = {}) => {
 
@@ -45,10 +46,10 @@ export const track = (args = {}) => {
     });
     sdk.start();
 
-    process.on('SIGTERM', () => {
+    /*process.on('SIGTERM', () => {
         sdk.shutdown()
             .then(() => {})
             .catch((error) => console.log('Error terminating tracing', error))
             .finally(() => process.exit(0));
-    });
+    });*/
 };
