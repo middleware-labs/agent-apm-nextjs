@@ -1,6 +1,6 @@
 {
   "name": "@middleware.io/agent-apm-nextjs",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "Agent APM for NextJs",
   "main": "index.js",
   "scripts": {
