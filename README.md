@@ -3,7 +3,7 @@
 ### agent-apm-nextjs
 Description: Agent APM for Next.js
 
-## Prerequisites
+### Prerequisites
 
 Before proceeding with the Next.js APM setup, make sure you have the `@opentelemetry/api` package installed. If it's not already installed, run the following command:
 
