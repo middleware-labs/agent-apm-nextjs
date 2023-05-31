@@ -3,6 +3,15 @@
 ### agent-apm-nextjs
 Description: Agent APM for Next.js
 
+## Prerequisites
+
+Before proceeding with the Next.js APM setup, make sure you have the `@opentelemetry/api` package installed. If it's not already installed, run the following command:
+
+```
+npm install @opentelemetry/api@">=1.3.0 <1.5.0"
+```
+
+
 ### Guides
 You can use this APM to track your self-hosted *(other than Vercel platform)* project . Run follow steps:
 1. Run `npm install @middleware.io/agent-apm-nextjs`.
