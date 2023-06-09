@@ -5,6 +5,13 @@ import { Resource } from "@opentelemetry/resources";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
 
+// import { DiagConsoleLogger, DiagLogLevel, diag } from '@opentelemetry/api';
+import { logs, SeverityNumber } from '@opentelemetry/api-logs';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+import { LoggerProvider, SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
+
+import packageJson from './package.json';
+
 export const track = (args = {}) => {
 
     /*if (process.env.NEXT_RUNTIME !== 'nodejs') {
@@ -13,17 +20,17 @@ export const track = (args = {}) => {
 
     const config = {
         hostUrl: 'http://localhost:9319',
-        projectName: "Project-" + process.pid,
-        serviceName: "Service-" + process.pid,
-        accountKey: "",
-        target: "",
+        projectName: `Project-${process.pid}`,
+        serviceName: `Service-${process.pid}`,
+        accountKey: '',
+        target: '',
         ...args,
     };
 
-    const resourceAttributes = {
+    const _resourceAttributes = {
         [SemanticResourceAttributes.SERVICE_NAME]: config.serviceName,
-        ['mw_agent']: true,
-        ['project.name']: config.projectName,
+        'mw_agent': true,
+        'project.name': config.projectName,
         ...(config.accountKey !== "" && {'mw.account_key': config.accountKey}),
     };
 
@@ -35,19 +42,79 @@ export const track = (args = {}) => {
         config.hostUrl = `http://${process.env.MW_AGENT_SERVICE}:9319`;
     }
 
-    // const configUrl = ((config.target).toLowerCase() === "vercel") ? {} : {url: `${config.hostUrl}/v1/traces`};
-    const configUrl = ((config.target).toLowerCase() === "vercel") ? {} : {url: `${config.hostUrl}`};
+    const _hostUrl = ((config.target).toLowerCase() === 'vercel') ? {} : {url: `${config.hostUrl}`};
 
+    setupTracer(_hostUrl, _resourceAttributes);
+    setupLogger(_hostUrl, _resourceAttributes);
+};
+
+const setupTracer = (hostUrl, resourceAttributes) => {
     const sdk = new NodeSDK({
         resource: new Resource(resourceAttributes),
-        spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter(configUrl)),
+        spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter(hostUrl)),
     });
     sdk.start();
 
     process.on('SIGTERM', () => {
         sdk.shutdown()
-            .then(() => {})
-            .catch((error) => console.log('Error terminating tracing', error))
+            .catch(error => console.log('Error terminating tracing', error))
             .finally(() => process.exit(0));
     });
 };
+
+const setupLogger = (hostUrl, resourceAttributes) => {
+
+    // Optional and only needed to see the internal diagnostic logging (during development)
+    // diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
+
+    const loggerProvider = new LoggerProvider({
+        resource: new Resource(resourceAttributes)
+    });
+
+    loggerProvider.addLogRecordProcessor(
+        new SimpleLogRecordProcessor(new OTLPLogExporter(hostUrl)),
+    );
+    logs.setGlobalLoggerProvider(loggerProvider);
+};
+
+const logger = (level, message, attributes = {}) => {
+    const logger = logs.getLogger(packageJson.name, packageJson.version);
+
+    logger.emit({
+        severityNumber: SeverityNumber[level],
+        severityText: level,
+        body: message,
+        attributes: {
+            'fluent.tag': 'nextjs.app',
+            'mw.app.lang': 'nextjs',
+            'level': level.toLowerCase(),
+            ...(typeof attributes === 'object' && Object.keys(attributes).length ? attributes : {})
+        },
+    });
+};
+
+const info = (message, attributes = {}) => {
+    logger('INFO', message, attributes);
+};
+
+const warn = (message, attributes = {}) => {
+    logger('WARN', message, attributes);
+};
+
+const debug = (message, attributes = {}) => {
+    logger('DEBUG', message, attributes);
+};
+
+const error = (message, attributes = {}) => {
+    logger('ERROR', message, attributes);
+};
+
+const tracker = {
+    track,
+    info,
+    error,
+    warn,
+    debug,
+};
+
+export default tracker;
