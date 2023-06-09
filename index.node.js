@@ -10,7 +10,7 @@ import { logs, SeverityNumber } from '@opentelemetry/api-logs';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { LoggerProvider, SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
 
-import packageJson from './package.json';
+import packageJson from './package.json' assert { type: "json" };
 
 export const track = (args = {}) => {
 
