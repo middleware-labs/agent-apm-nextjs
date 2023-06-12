@@ -32,7 +32,8 @@ export const track = (args = {}) => {
         [SemanticResourceAttributes.SERVICE_NAME]: config.serviceName,
         'mw_agent': true,
         'project.name': config.projectName,
-        ...(config.accountKey !== "" && {'mw.account_key': config.accountKey}),
+        ...(config.accountKey && {'mw.account_key': config.accountKey}),
+        ...(config.accountKey && {'accessToken': config.accountKey}),
     };
 
     if (config.target !== "") {
