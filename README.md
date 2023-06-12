@@ -71,8 +71,7 @@ export function register() {
     });
 }
 ```
-### Step 4: Enable Logging
-To enable logging in your project, you need to add the following code in your file:
+4. To enable logging in your project, you need to add the following code in your file:
 ```javascript
 // @ts-ignore
 import tracker from '@middleware.io/agent-apm-nextjs';
