@@ -3,9 +3,9 @@ import { NodeSDK } from "@opentelemetry/sdk-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
 import { Resource } from "@opentelemetry/resources";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
-import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
-// import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
-// import { GrpcInstrumentation } from "@opentelemetry/instrumentation-grpc";
+// import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
+import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
+import { GrpcInstrumentation } from "@opentelemetry/instrumentation-grpc";
 
 // import { DiagConsoleLogger, DiagLogLevel, diag } from '@opentelemetry/api';
 import { logs, SeverityNumber } from '@opentelemetry/api-logs';
@@ -53,23 +53,24 @@ export const track = (args = {}) => {
 };
 
 const setupTracer = (hostUrl, resourceAttributes) => {
-    const sdk = new NodeSDK({
+    /*const sdk = new NodeSDK({
         resource: new Resource(resourceAttributes),
         spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter(hostUrl)),
-    });
-    /*const sdk = new NodeSDK({
+    });*/
+    const sdk = new NodeSDK({
         traceExporter: new OTLPTraceExporter(hostUrl),
         instrumentations: [
             getNodeAutoInstrumentations({
-                "@opentelemetry/instrumentation-grpc": {},
-                "@opentelemetry/instrumentation-http": {},
+                '@opentelemetry/instrumentation-fs': {
+                    enabled: false,
+                },
             }),
             new GrpcInstrumentation({
                 ignoreGrpcMethods:["Export"]
             })
         ],
     });
-    sdk.addResource(new Resource(resourceAttributes));*/
+    sdk.addResource(new Resource(resourceAttributes));
     sdk.start();
 
     process.on('SIGTERM', () => {
