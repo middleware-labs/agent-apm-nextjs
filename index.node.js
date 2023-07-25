@@ -12,6 +12,8 @@ import { logs, SeverityNumber } from '@opentelemetry/api-logs';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { LoggerProvider, SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
 
+import Pyroscope from '@pyroscope/nodejs';
+import axios from 'axios';
 import fs from 'fs';
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
@@ -145,9 +147,6 @@ const error = (message, attributes = {}) => {
 const setupProfiling = async (obj) => {
     if (obj.accessToken !== '') {
         try {
-            const Pyroscope = require('@pyroscope/nodejs');
-            const axios = require('axios');
-
             const authUrl = process.env.MW_AUTH_URL || obj.authUrl;
 
             const response = await axios.post(authUrl, null, {
