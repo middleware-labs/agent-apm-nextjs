@@ -20,22 +20,31 @@ export const track = (args = {}) => {
     /*if (process.env.NEXT_RUNTIME !== 'nodejs') {
         return;
     }*/
+    const constants = {
+        mwAuthUrl: 'https://app.middleware.io/api/v1/auth',
+        profilingServerUrl: 'https://profiling.middleware.io',
+    }
 
     const config = {
         hostUrl: 'http://localhost:9319',
         projectName: `Project-${process.pid}`,
         serviceName: `Service-${process.pid}`,
-        accountKey: '',
+        accessToken: '',
         target: '',
         ...args,
     };
+
+    // For backward compatibility
+    if (args.hasOwnProperty('accountKey') && args.accountKey !== '') {
+        config.accessToken = args.accountKey;
+    }
 
     const _resourceAttributes = {
         [SemanticResourceAttributes.SERVICE_NAME]: config.serviceName,
         'mw_agent': true,
         'project.name': config.projectName,
-        ...(config.accountKey && {'mw.account_key': config.accountKey}),
-        ...(config.accountKey && {'accessToken': config.accountKey}),
+        ...(config.accessToken && {'mw.account_key': config.accessToken}),
+        ...(config.accessToken && {'accessToken': config.accessToken}),
     };
 
     if (config.target !== "") {
@@ -50,6 +59,12 @@ export const track = (args = {}) => {
 
     setupTracer(_hostUrl, _resourceAttributes);
     setupLogger(_hostUrl, _resourceAttributes);
+    setupProfiling({
+        authUrl: constants.mwAuthUrl,
+        profilingServerUrl: constants.profilingServerUrl,
+        accessToken: config.accessToken,
+        serviceName: config.serviceName
+    }).then(() => {});
 };
 
 const setupTracer = (hostUrl, resourceAttributes) => {
@@ -125,6 +140,52 @@ const debug = (message, attributes = {}) => {
 
 const error = (message, attributes = {}) => {
     logger('ERROR', message, attributes);
+};
+
+const setupProfiling = async (obj) => {
+    if (obj.accessToken !== '') {
+        try {
+            const Pyroscope = require('@pyroscope/nodejs');
+            const axios = require('axios');
+
+            const authUrl = process.env.MW_AUTH_URL || obj.authUrl;
+
+            const response = await axios.post(authUrl, null, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer ' + obj.accessToken,
+                },
+            });
+
+            if (response.status === 200) {
+                const data = response.data;
+                if (data.hasOwnProperty('success') && data.success === true) {
+                    const account = data.data.account;
+                    if (data.hasOwnProperty('data')
+                        && data.data.hasOwnProperty('account')
+                        && typeof data.data.account === 'string') {
+
+                        Pyroscope.init({
+                            serverAddress: process.env.MW_PROFILING_SERVER_URL || obj.profilingServerUrl,
+                            appName: obj.serviceName,
+                            tenantID: account,
+                        });
+
+                        Pyroscope.start();
+                    } else {
+                        console.log('Failed to retrieve TenantID from API response');
+                    }
+                } else {
+                    console.log('Failed to authenticate with Middleware API, kindly check your access token');
+                }
+            } else {
+                console.log('Error making auth request');
+            }
+
+        } catch (e) {
+            console.log('Error starting profiling:', e.message);
+        }
+    }
 };
 
 const tracker = {
