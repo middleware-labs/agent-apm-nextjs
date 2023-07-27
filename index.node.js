@@ -1,23 +1,19 @@
 'use strict';
-import { NodeSDK } from "@opentelemetry/sdk-node";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
-import { Resource } from "@opentelemetry/resources";
-import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
-// import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
-import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
-import { GrpcInstrumentation } from "@opentelemetry/instrumentation-grpc";
+const { NodeSDK } = require("@opentelemetry/sdk-node");
+const { OTLPTraceExporter } = require("@opentelemetry/exporter-trace-otlp-grpc");
+const { Resource } = require("@opentelemetry/resources");
+const { SemanticResourceAttributes } = require("@opentelemetry/semantic-conventions");
+const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");
+const { GrpcInstrumentation } = require("@opentelemetry/instrumentation-grpc");
 
-// import { DiagConsoleLogger, DiagLogLevel, diag } from '@opentelemetry/api';
-import { logs, SeverityNumber } from '@opentelemetry/api-logs';
-import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
-import { LoggerProvider, SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
+const { logs, SeverityNumber } = require('@opentelemetry/api-logs');
+const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-grpc');
+const { LoggerProvider, SimpleLogRecordProcessor } = require('@opentelemetry/sdk-logs');
 
-import Pyroscope from '@pyroscope/nodejs';
-import axios from 'axios';
-import fs from 'fs';
+const fs = require('fs');
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
-export const track = (args = {}) => {
+module.exports.track = (args = {}) => {
 
     /*if (process.env.NEXT_RUNTIME !== 'nodejs') {
         return;
@@ -25,7 +21,7 @@ export const track = (args = {}) => {
     const constants = {
         mwAuthUrl: 'https://app.middleware.io/api/v1/auth',
         profilingServerUrl: 'https://profiling.middleware.io',
-    }
+    };
 
     const config = {
         hostUrl: 'http://localhost:9319',
@@ -70,10 +66,6 @@ export const track = (args = {}) => {
 };
 
 const setupTracer = (hostUrl, resourceAttributes) => {
-    /*const sdk = new NodeSDK({
-        resource: new Resource(resourceAttributes),
-        spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter(hostUrl)),
-    });*/
     const sdk = new NodeSDK({
         traceExporter: new OTLPTraceExporter(hostUrl),
         instrumentations: [
@@ -98,10 +90,6 @@ const setupTracer = (hostUrl, resourceAttributes) => {
 };
 
 const setupLogger = (hostUrl, resourceAttributes) => {
-
-    // Optional and only needed to see the internal diagnostic logging (during development)
-    // diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
-
     const loggerProvider = new LoggerProvider({
         resource: new Resource(resourceAttributes)
     });
@@ -128,25 +116,28 @@ const logger = (level, message, attributes = {}) => {
     });
 };
 
-const info = (message, attributes = {}) => {
+module.exports.info = (message, attributes = {}) => {
     logger('INFO', message, attributes);
 };
 
-const warn = (message, attributes = {}) => {
+module.exports.warn = (message, attributes = {}) => {
     logger('WARN', message, attributes);
 };
 
-const debug = (message, attributes = {}) => {
+module.exports.debug = (message, attributes = {}) => {
     logger('DEBUG', message, attributes);
 };
 
-const error = (message, attributes = {}) => {
+module.exports.error = (message, attributes = {}) => {
     logger('ERROR', message, attributes);
 };
 
 const setupProfiling = async (obj) => {
     if (obj.accessToken !== '') {
         try {
+            const Pyroscope = require('@pyroscope/nodejs');
+            const axios = require('axios');
+
             const authUrl = process.env.MW_AUTH_URL || obj.authUrl;
 
             const response = await axios.post(authUrl, null, {
@@ -186,13 +177,3 @@ const setupProfiling = async (obj) => {
         }
     }
 };
-
-const tracker = {
-    track,
-    info,
-    error,
-    warn,
-    debug,
-};
-
-export default tracker;

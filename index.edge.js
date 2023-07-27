@@ -1,31 +1,21 @@
 'use strict';
 
-export const track = (args = {}) => {
+module.exports.track = (args = {}) => {
     return true;
 };
 
-const info = (message, attributes = {}) => {
+module.exports.info = (message, attributes = {}) => {
     return true;
 };
 
-const warn = (message, attributes = {}) => {
+module.exports.warn = (message, attributes = {}) => {
     return true;
 };
 
-const debug = (message, attributes = {}) => {
+module.exports.debug = (message, attributes = {}) => {
     return true;
 };
 
-const error = (message, attributes = {}) => {
+module.exports.error = (message, attributes = {}) => {
     return true;
 };
-
-const tracker = {
-    track,
-    info,
-    error,
-    warn,
-    debug,
-};
-
-export default tracker;

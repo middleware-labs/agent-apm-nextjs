@@ -26,13 +26,15 @@ npm install @middleware.io/agent-apm-nextjs
 As this feature is experimental, you need to explicitly opt-in by providing below thing into your **next.config.js** file.
 ```javascript
 const nextConfig = {
-     ---
-     ---
+    // ...
+    // Your existing code
+    
      experimental: {
          instrumentationHook: true
      }
-     ---
-     ---
+     
+    // ...
+    // Your existing code
 }
 module.exports = nextConfig
 ```
