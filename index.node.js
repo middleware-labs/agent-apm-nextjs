@@ -66,6 +66,18 @@ module.exports.track = (args = {}) => {
 };
 
 const setupTracer = (hostUrl, resourceAttributes) => {
+    const api = require('@opentelemetry/api');
+    const { CompositePropagator } = require('@opentelemetry/core');
+    const { B3Propagator, B3InjectEncoding } = require('@opentelemetry/propagator-b3');
+    api.propagation.setGlobalPropagator(
+        new CompositePropagator({
+            propagators: [
+                new B3Propagator(),
+                new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
+            ],
+        })
+    );
+
     const sdk = new NodeSDK({
         traceExporter: new OTLPTraceExporter(hostUrl),
         instrumentations: [
