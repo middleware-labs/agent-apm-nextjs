@@ -10,8 +10,6 @@ const { logs, SeverityNumber } = require('@opentelemetry/api-logs');
 const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-grpc');
 const { LoggerProvider, SimpleLogRecordProcessor } = require('@opentelemetry/sdk-logs');
 
-const fs = require('fs');
-
 module.exports.track = (args = {}) => {
 
     /*if (process.env.NEXT_RUNTIME !== 'nodejs') {
