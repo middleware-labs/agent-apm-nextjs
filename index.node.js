@@ -11,7 +11,6 @@ const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-grpc');
 const { LoggerProvider, SimpleLogRecordProcessor } = require('@opentelemetry/sdk-logs');
 
 const fs = require('fs');
-const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
 module.exports.track = (args = {}) => {
 
@@ -113,7 +112,7 @@ const setupLogger = (hostUrl, resourceAttributes) => {
 };
 
 const logger = (level, message, attributes = {}) => {
-    const logger = logs.getLogger(packageJson.name, packageJson.version);
+    const logger = logs.getLogger("@middleware.io/agent-apm-nextjs", "latest");
 
     logger.emit({
         severityNumber: SeverityNumber[level],
