@@ -17,7 +17,6 @@ module.exports.track = (args = {}) => {
     }*/
     const constants = {
         mwAuthUrl: 'https://app.middleware.io/api/v1/auth',
-        profilingServerUrl: 'https://profiling.middleware.io',
     };
 
     const config = {
@@ -25,6 +24,7 @@ module.exports.track = (args = {}) => {
         projectName: `Project-${process.pid}`,
         serviceName: `Service-${process.pid}`,
         accessToken: '',
+        profilingServerUrl: '',
         target: '',
         ...args,
     };
@@ -56,9 +56,9 @@ module.exports.track = (args = {}) => {
     setupLogger(_hostUrl, _resourceAttributes);
     setupProfiling({
         authUrl: constants.mwAuthUrl,
-        profilingServerUrl: constants.profilingServerUrl,
+        profilingServerUrl: config.profilingServerUrl,
         accessToken: config.accessToken,
-        serviceName: config.serviceName
+        serviceName: config.serviceName,
     }).then(() => {});
 };
 
@@ -163,9 +163,14 @@ const setupProfiling = async (obj) => {
                     if (data.hasOwnProperty('data')
                         && data.data.hasOwnProperty('account')
                         && typeof data.data.account === 'string') {
+                        
+                        let profilingServerUrl = obj.profilingServerUrl  
+                        if (!profilingServerUrl) {
+                            profilingServerUrl = process.env.MW_PROFILING_SERVER_URL || `https://${account}.middleware.io/profiling`
+                        }  
 
                         Pyroscope.init({
-                            serverAddress: process.env.MW_PROFILING_SERVER_URL || obj.profilingServerUrl,
+                            serverAddress: profilingServerUrl,
                             appName: obj.serviceName,
                             tenantID: account,
                         });
