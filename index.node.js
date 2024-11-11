@@ -37,6 +37,7 @@ module.exports.track = (args = {}) => {
     const _resourceAttributes = {
         [SemanticResourceAttributes.SERVICE_NAME]: config.serviceName,
         'mw_agent': true,
+        "channel": "vercel",
         'project.name': config.projectName,
         ...(config.accessToken && {'mw.account_key': config.accessToken}),
         ...(config.accessToken && {'accessToken': config.accessToken}),
