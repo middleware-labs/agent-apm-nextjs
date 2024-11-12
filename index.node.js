@@ -38,6 +38,7 @@ module.exports.track = (args = {}) => {
         [SemanticResourceAttributes.SERVICE_NAME]: config.serviceName,
         'mw_agent': true,
         "channel": "vercel",
+        'mw_serverless': true,
         'project.name': config.projectName,
         ...(config.accessToken && {'mw.account_key': config.accessToken}),
         ...(config.accessToken && {'accessToken': config.accessToken}),
