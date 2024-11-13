@@ -15,6 +15,10 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org
+      - name: install dependencies
+        run: npm install
+      - name: build
+        run: npm run build  # Assuming you have a "build" script defined in your package.json
       - name: publish
         run: npm publish --access public
         env:
