@@ -26,6 +26,11 @@ module.exports.track = (args = {}) => {
         accessToken: '',
         profilingServerUrl: '',
         target: '',
+        envVercelDeploymentId: process.env.VERCEL_DEPLOYMENT_ID || '',
+        envVercelProjectId: process.env.VERCEL_PROJECT_ID || '',
+        envVercelEnv: process.env.VERCEL_ENV || '',
+        envVercelUrl: process.env.VERCEL_URL || '',
+        envVercelRegion: process.env.VERCEL_REGION || '',
         ...args,
     };
 
@@ -42,6 +47,11 @@ module.exports.track = (args = {}) => {
         'project.name': config.projectName,
         ...(config.accessToken && {'mw.account_key': config.accessToken}),
         ...(config.accessToken && {'accessToken': config.accessToken}),
+        ...(config.envVercelDeploymentId && {'deploymentId': config.envVercelDeploymentId}),
+        ...(config.envVercelProjectId && {'projectId': config.envVercelProjectId}),
+        ...(config.envVercelEnv && {'environment': config.envVercelEnv}),
+        ...(config.envVercelUrl && {'host': config.envVercelUrl}),
+        ...(config.envVercelRegion && {'region': config.envVercelRegion}),
     };
 
     if (config.target !== "") {

@@ -30,7 +30,8 @@ const nextConfig = {
     // Your existing code
     
      experimental: {
-         instrumentationHook: true
+         instrumentationHook: true,
+         serverComponentsExternalPackages: ['@middleware.io/agent-apm-nextjs']
      }
      
     // ...
@@ -48,7 +49,6 @@ import tracker from '@middleware.io/agent-apm-nextjs';
 
 export function register() {
     tracker.track({
-        projectName: "<PROJECT-NAME>",
         serviceName: "<SERVICE-NAME>",
         accessToken: "<ACCESS-TOKEN>",
         target: "vercel",
@@ -65,7 +65,6 @@ import tracker from '@middleware.io/agent-apm-nextjs';
 
 export function register() {
     tracker.track({
-        projectName: "<PROJECT-NAME>",
         serviceName: "<SERVICE-NAME>",
         accessToken: "<ACCESS-TOKEN>",
     });
@@ -78,7 +77,6 @@ import tracker from '@middleware.io/agent-apm-nextjs';
 
 export function register() {
     tracker.track({
-        projectName: "<PROJECT-NAME>",
         serviceName: "<SERVICE-NAME>",
         accessToken: "<ACCESS-TOKEN>",
         target: "https://<ACCOUNT-UID>.middleware.io:443"
