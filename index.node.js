@@ -156,7 +156,14 @@ module.exports.error = (message, attributes = {}) => {
 const setupProfiling = async (obj) => {
     if (obj.accessToken !== '') {
         try {
-            const Pyroscope = require('@pyroscope/nodejs');
+            let Pyroscope;
+            try {
+                Pyroscope = require('@pyroscope/nodejs');
+            } catch (err) {
+                console.log('Pyroscope is not installed. Skipping profiling setup.');
+                return;
+            }
+
             const axios = require('axios');
 
             const authUrl = process.env.MW_AUTH_URL || obj.authUrl;
@@ -175,11 +182,11 @@ const setupProfiling = async (obj) => {
                     if (data.hasOwnProperty('data')
                         && data.data.hasOwnProperty('account')
                         && typeof data.data.account === 'string') {
-                        
-                        let profilingServerUrl = obj.profilingServerUrl  
+
+                        let profilingServerUrl = obj.profilingServerUrl;
                         if (!profilingServerUrl) {
-                            profilingServerUrl = process.env.MW_PROFILING_SERVER_URL || `https://${account}.middleware.io/profiling`
-                        }  
+                            profilingServerUrl = process.env.MW_PROFILING_SERVER_URL || `https://${account}.middleware.io/profiling`;
+                        }
 
                         Pyroscope.init({
                             serverAddress: profilingServerUrl,
