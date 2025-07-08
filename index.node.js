@@ -10,7 +10,11 @@ const { logs, SeverityNumber } = require('@opentelemetry/api-logs');
 const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-grpc');
 const { LoggerProvider, SimpleLogRecordProcessor } = require('@opentelemetry/sdk-logs');
 
-module.exports.track = (args = {}) => {
+// Import new modules
+const { addVCSMetadata, getEnvironmentVCSData } = require('./lib/vcs-helper');
+const { initializeNextJSExceptionHandling, handleManualException } = require('./lib/nextjs-exception-handler');
+
+module.exports.track = async (args = {}) => {
 
     /*if (process.env.NEXT_RUNTIME !== 'nodejs') {
         return;
@@ -31,6 +35,7 @@ module.exports.track = (args = {}) => {
         envVercelEnv: process.env.VERCEL_ENV || '',
         envVercelUrl: process.env.VERCEL_URL || '',
         envVercelRegion: process.env.VERCEL_REGION || '',
+        enableExceptionHandling: true, // Enable by default
         ...args,
     };
 
@@ -45,6 +50,8 @@ module.exports.track = (args = {}) => {
         "channel": "vercel",
         'mw_serverless': true,
         'project.name': config.projectName,
+        'mw.app.lang': 'nextjs',
+        'mw.sdk.version': '1.3.0-rc.2',
         ...(config.accessToken && {'mw.account_key': config.accessToken}),
         ...(config.accessToken && {'accessToken': config.accessToken}),
         ...(config.envVercelDeploymentId && {'deploymentId': config.envVercelDeploymentId}),
@@ -53,6 +60,13 @@ module.exports.track = (args = {}) => {
         ...(config.envVercelUrl && {'host': config.envVercelUrl}),
         ...(config.envVercelRegion && {'region': config.envVercelRegion}),
     };
+
+    // Add environment-specific VCS data
+    const envVCSData = getEnvironmentVCSData();
+    Object.assign(_resourceAttributes, envVCSData);
+
+    // Add VCS metadata from Git repository
+    await addVCSMetadata(_resourceAttributes);
 
     if (config.target !== "") {
         config.hostUrl = config.target;
@@ -64,8 +78,14 @@ module.exports.track = (args = {}) => {
 
     const _hostUrl = ((config.target).toLowerCase() === 'vercel') ? {} : {url: `${config.hostUrl}`};
 
-    setupTracer(_hostUrl, _resourceAttributes);
+    await setupTracer(_hostUrl, _resourceAttributes);
     setupLogger(_hostUrl, _resourceAttributes);
+    
+    // Initialize exception handling
+    if (config.enableExceptionHandling) {
+        initializeNextJSExceptionHandling(config);
+    }
+    
     setupProfiling({
         authUrl: constants.mwAuthUrl,
         profilingServerUrl: config.profilingServerUrl,
@@ -74,7 +94,7 @@ module.exports.track = (args = {}) => {
     }).then(() => {});
 };
 
-const setupTracer = (hostUrl, resourceAttributes) => {
+const setupTracer = async (hostUrl, resourceAttributes) => {
     const api = require('@opentelemetry/api');
     const { CompositePropagator } = require('@opentelemetry/core');
     const { B3Propagator, B3InjectEncoding } = require('@opentelemetry/propagator-b3');
@@ -99,8 +119,9 @@ const setupTracer = (hostUrl, resourceAttributes) => {
                 ignoreGrpcMethods:["Export"]
             })
         ],
+        resource: new Resource(resourceAttributes),
     });
-    sdk.addResource(new Resource(resourceAttributes));
+    
     sdk.start();
 
     process.on('SIGTERM', () => {
@@ -152,6 +173,25 @@ module.exports.debug = (message, attributes = {}) => {
 module.exports.error = (message, attributes = {}) => {
     logger('ERROR', message, attributes);
 };
+
+// Add manual exception handling method
+module.exports.captureException = (error, attributes = {}) => {
+    // Log the error
+    logger('ERROR', error.message, {
+        ...attributes,
+        'exception.type': error.constructor.name,
+        'exception.message': error.message,
+        'exception.stacktrace': error.stack,
+    });
+    
+    // Handle the exception with full context
+    handleManualException(error);
+};
+
+// Export wrapper functions for user convenience
+module.exports.wrapAPIHandler = require('./lib/nextjs-exception-handler').wrapNextJSAPIHandler;
+module.exports.wrapMiddleware = require('./lib/nextjs-exception-handler').wrapNextJSMiddleware;
+module.exports.wrapServerComponent = require('./lib/nextjs-exception-handler').wrapNextJSServerComponent;
 
 const setupProfiling = async (obj) => {
     if (obj.accessToken !== '') {
