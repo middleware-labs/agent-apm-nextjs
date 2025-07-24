@@ -39,10 +39,13 @@ module.exports.track = async (args = {}) => {
         ...args,
     };
 
-    // For backward compatibility
-    if (args.hasOwnProperty('accountKey') && args.accountKey !== '') {
+    const mwApiKey = process.env.MW_ACCESS_TOKEN || '';
+    
+    if (mwApiKey) 
+        config.accessToken = mwApiKey;
+    else if (args.hasOwnProperty('accountKey') && args.accountKey !== '')
         config.accessToken = args.accountKey;
-    }
+    
 
     const _resourceAttributes = {
         [SemanticResourceAttributes.SERVICE_NAME]: config.serviceName,
@@ -52,8 +55,8 @@ module.exports.track = async (args = {}) => {
         'project.name': config.projectName,
         'mw.app.lang': 'nextjs',
         'mw.sdk.version': '1.3.0-rc.2',
-        ...(config.accessToken && {'mw.account_key': config.accessToken}),
-        ...(config.accessToken && {'accessToken': config.accessToken}),
+        // ...(config.accessToken && {'mw.account_key': config.accessToken}),
+        // ...(config.accessToken && {'accessToken': config.accessToken}),
         ...(config.envVercelDeploymentId && {'deploymentId': config.envVercelDeploymentId}),
         ...(config.envVercelProjectId && {'projectId': config.envVercelProjectId}),
         ...(config.envVercelEnv && {'environment': config.envVercelEnv}),
@@ -78,7 +81,7 @@ module.exports.track = async (args = {}) => {
 
     const _hostUrl = ((config.target).toLowerCase() === 'vercel') ? {} : {url: `${config.hostUrl}`};
 
-    await setupTracer(_hostUrl, _resourceAttributes);
+    await setupTracer(_hostUrl, _resourceAttributes, config);
     setupLogger(_hostUrl, _resourceAttributes);
     
     // Initialize exception handling
@@ -94,7 +97,7 @@ module.exports.track = async (args = {}) => {
     }).then(() => {});
 };
 
-const setupTracer = async (hostUrl, resourceAttributes) => {
+const setupTracer = async (hostUrl, resourceAttributes, config) => {
     const api = require('@opentelemetry/api');
     const { CompositePropagator } = require('@opentelemetry/core');
     const { B3Propagator, B3InjectEncoding } = require('@opentelemetry/propagator-b3');
@@ -108,7 +111,7 @@ const setupTracer = async (hostUrl, resourceAttributes) => {
     );
 
     const sdk = new NodeSDK({
-        traceExporter: new OTLPTraceExporter(hostUrl),
+        traceExporter: new OTLPTraceExporter({...hostUrl, Authorization: config.accessToken}),
         instrumentations: [
             getNodeAutoInstrumentations({
                 '@opentelemetry/instrumentation-fs': {
