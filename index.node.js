@@ -36,6 +36,7 @@ module.exports.track = async (args = {}) => {
         envVercelUrl: process.env.VERCEL_URL || '',
         envVercelRegion: process.env.VERCEL_REGION || '',
         enableExceptionHandling: true, // Enable by default
+        appVersion: process.env.MW_APP_VERSION || 'latest',
         ...args,
     };
 
@@ -45,7 +46,24 @@ module.exports.track = async (args = {}) => {
         config.accessToken = mwApiKey;
     else if (args.hasOwnProperty('accountKey') && args.accountKey !== '')
         config.accessToken = args.accountKey;
-    
+
+    if (process.env.MW_CUSTOM_RESOURCE_ATTRIBUTES && process.env.MW_CUSTOM_RESOURCE_ATTRIBUTES !== '') {
+        try {
+            const customAttributes = process.env.MW_CUSTOM_RESOURCE_ATTRIBUTES.split(',').reduce((acc, attr) => {
+                const [key, value] = attr.split('=');
+                if (key && value) {
+                    acc[key.trim()] = value.trim();
+                }
+                return acc;
+            }, {});
+            config.customResourceAttributes = customAttributes;
+        } catch (e) {
+            console.error('Error parsing MW_CUSTOM_RESOURCE_ATTRIBUTES:', e);
+            config.customResourceAttributes = {};
+        }
+    } else {
+        config.customResourceAttributes = {};
+    }
 
     const _resourceAttributes = {
         [SemanticResourceAttributes.SERVICE_NAME]: config.serviceName,
@@ -55,13 +73,12 @@ module.exports.track = async (args = {}) => {
         'project.name': config.projectName,
         'mw.app.lang': 'nextjs',
         'mw.sdk.version': '1.3.0-rc.2',
-        // ...(config.accessToken && {'mw.account_key': config.accessToken}),
-        // ...(config.accessToken && {'accessToken': config.accessToken}),
         ...(config.envVercelDeploymentId && {'deploymentId': config.envVercelDeploymentId}),
         ...(config.envVercelProjectId && {'projectId': config.envVercelProjectId}),
         ...(config.envVercelEnv && {'environment': config.envVercelEnv}),
         ...(config.envVercelUrl && {'host': config.envVercelUrl}),
         ...(config.envVercelRegion && {'region': config.envVercelRegion}),
+        ...(config.customResourceAttributes && typeof config.customResourceAttributes === 'object' ? config.customResourceAttributes : {}),
     };
 
     // Add environment-specific VCS data
