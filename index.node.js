@@ -13,6 +13,7 @@ const { LoggerProvider, SimpleLogRecordProcessor } = require('@opentelemetry/sdk
 // Import new modules
 const { addVCSMetadata, getEnvironmentVCSData } = require('./lib/vcs-helper');
 const { initializeNextJSExceptionHandling, handleManualException } = require('./lib/nextjs-exception-handler');
+const { getPackageVersion } = require('./lib/utils');
 
 module.exports.track = async (args = {}) => {
 
@@ -69,10 +70,10 @@ module.exports.track = async (args = {}) => {
         [SemanticResourceAttributes.SERVICE_NAME]: config.serviceName,
         'mw_agent': true,
         "channel": "vercel",
-        'mw_serverless': true,
+        'mw_serverless': config.target !== "",
         'project.name': config.projectName,
         'mw.app.lang': 'nextjs',
-        'mw.sdk.version': '1.3.0-rc.2',
+        'mw.sdk.version': getPackageVersion(),
         ...(config.envVercelDeploymentId && {'deploymentId': config.envVercelDeploymentId}),
         ...(config.envVercelProjectId && {'projectId': config.envVercelProjectId}),
         ...(config.envVercelEnv && {'environment': config.envVercelEnv}),
