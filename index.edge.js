@@ -1,5 +1,7 @@
 "use strict";
 
+const stringifySafe = require("json-stringify-safe");
+
 // Edge runtime has limited capabilities, so we provide basic functionality
 let isInitialized = false;
 
