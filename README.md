@@ -3,6 +3,13 @@
 ## agent-apm-nextjs
 Description: Agent APM for Next.js with Advanced Exception Handling
 
+## Before NPM Pack & Publish:
+Now we have 2 types of tags: `latest` and `no-profile`.
+
+`latest`: has all the features.
+
+`no-profile`: has all the features except profiling, client: surface.
+
 ## Prerequisites
 Make sure you have installed the latest version of Next.js or a version greater than 13.4+, as Vercel introduced their experimental feature in that release.
 
